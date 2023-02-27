@@ -1,0 +1,77 @@
+/* preloader */
+body.preloader-site {
+  overflow: hidden;
+}
+
+.preloader-wrapper {
+  height: 100%;
+  width: 100%;
+  background: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999999;
+}
+
+.preloader-wrapper .preloader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 120px;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+    width: 100vw;
+}
+
+.modal-footer .btn {
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+.flag {
+ height: 100px;
+ display: block; 
+ margin: 0 auto;
+}
+
+.capital {
+  text-transform: uppercase;
+  color: red;
+}
+
+
+.wrapper, .form {
+  width: 300px;
+  padding: 0;
+  margin: 0;
+}
+
+.wrapper {
+  position: relative
+}
+
+#map, .form {
+  position: absolute;
+  top: 0;
+  left: 0
+}
+
+.form {
+  z-index: 100000;
+  padding: 10px 55px;
+  pointer-events: none;
+
+}
+
+.form > * {
+  pointer-events: auto;
+}
+

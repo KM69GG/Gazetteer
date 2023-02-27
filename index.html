@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="author" content="KM" />
+    <meta name="description" content="Gazetteer" />
+    <title>Gazetteer</title>
+    <link
+      rel="stylesheet"
+      href="dist/font-awesome-4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="icon" href="img/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="dist/easy-button.css" />
+    <link rel="stylesheet" href="dist/leaflet.css" />
+    <link rel="stylesheet" href="css/leaflet.extra-markers.min.css" />
+    <link rel="stylesheet" href="dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="dist/MarkerCluster.Default.css" />
+    <link
+      rel="stylesheet"
+      href="dist/bootstrap-5.0.2-dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <div class="preloader-wrapper">
+      <div class="preloader">
+        <img src="img/loader.gif" />
+      </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="wrapper">
+      <form class="form">
+        <select
+          class="custom-select custom-select-sm text-center text-uppercase border border-3 rounded fw-bold"
+          id="selCountry"
+        ></select>
+      </form>
+    </div>
+
+    <!-- Modal info -->
+    <div
+      class="modal fade text-center"
+      id="infoModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="infoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="infoModalLabel"></h5>
+            <img class="flag" src="" alt="flag" />
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless table-striped">
+              <tr>
+                <td class="text-start fw-bold">Continent</td>
+                <td id="continent" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Capital</td>
+                <td id="capital" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Area</td>
+                <td id="area" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Population</td>
+                <td id="population" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Language(s)</td>
+                <td id="languages" class="text-end"></td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal currency -->
+    <div
+      class="modal fade text-center"
+      id="currencyModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="currencyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="currencyModalLabel"></h5>
+            <img class="flag" src="" alt="flag" />
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless table-striped">
+              <tr>
+                <td class="text-start fw-bold">Currency</td>
+                <td id="currency" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Symbol</td>
+                <td id="symbol" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Code</td>
+                <td id="code" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Exchange rate</td>
+                <td id="rate" class="text-end"></td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal weather -->
+    <div
+      id="weatherModal"
+      class="modal fade"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="weatherModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="weatherModalLabel"></h5>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col border m-2">
+                <p class="fw-bold fs-5 mt-3">Today</p>
+                <div class="row">
+                  <div class="col text-center m-2">
+                    <p id="todayConditions" class="fw-bold fs-6"></p>
+                  </div>
+                  <div class="col text-center">
+                    <img
+                      id="todayIcon"
+                      class="img-fluid mt-0"
+                      src=""
+                      alt=""
+                      title=""
+                    />
+                  </div>
+                  <div class="col text-center">
+                    <p class="fw-bold fs-4 mb-0">
+                      <span id="todayMaxTemp"></span><sup>o</sup
+                      ><span class="tempMetric">c</span>
+                    </p>
+                    <p class="fs-5 mt-0 text-secondary">
+                      <span id="todayMinTemp"></span><sup>o</sup
+                      ><span class="tempMetric">c</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col border m-2">
+                <div class="row">
+                  <div class="col text-center">
+                    <p id="day1Date" class="fw-bold fs-6 mt-3"></p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col text-center">
+                    <p class="fw-bold fs-4 mb-0">
+                      <span id="day1MaxTemp"></span><sup>o</sup>c
+                    </p>
+                    <p class="fs-5 mt-0 text-secondary">
+                      <span id="day1MinTemp"></span><sup>o</sup>c
+                    </p>
+                  </div>
+                  <div class="col text-center">
+                    <img id="day1Icon" src="" alt="" title="" />
+                  </div>
+                </div>
+              </div>
+              <div class="col border m-2">
+                <div class="row">
+                  <div class="col text-center">
+                    <p id="day2Date" class="fw-bold fs-6 mt-3">Fri 16th</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col text-center">
+                    <p class="fw-bold fs-4 mb-0">
+                      <span id="day2MaxTemp"></span><sup>o</sup>c
+                    </p>
+                    <p class="fs-5 mt-0 text-secondary">
+                      <span id="day2MinTemp"></span><sup>o</sup>c
+                    </p>
+                  </div>
+                  <div class="col text-center">
+                    <img id="day2Icon" src="" alt="" title="" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal covid -->
+    <div
+      class="modal fade text-center"
+      id="covidModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="covidModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="covidModalLabel"></h5>
+            <img class="flag" src="" alt="flag" />
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless table-striped">
+              <tr>
+                <td class="text-start fw-bold">Total covid cases</td>
+                <td id="totalCases" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Total covid deaths</td>
+                <td id="totalDeaths" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Total recovered</td>
+                <td id="totalR" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Today covid cases</td>
+                <td id="todayCases" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Today covid deaths</td>
+                <td id="todayDeaths" class="text-end"></td>
+              </tr>
+              <tr>
+                <td class="text-start fw-bold">Today covid recovered</td>
+                <td id="todayR" class="text-end"></td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal news-->
+    <div
+      class="modal fade text-center"
+      id="newsModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="newsModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="newsModalLabel"></h5>
+            <img class="flag" src="" alt="flag" />
+          </div>
+
+          <div id="carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              <button
+                type="button"
+                data-bs-target="#carousel"
+                data-bs-slide-to="0"
+                class="active"
+                aria-current="true"
+                aria-label="Slide 1"
+              ></button>
+              <button
+                type="button"
+                data-bs-target="#carousel"
+                data-bs-slide-to="1"
+                aria-label="Slide 2"
+              ></button>
+              <button
+                type="button"
+                data-bs-target="#carousel"
+                data-bs-slide-to="2"
+                aria-label="Slide 3"
+              ></button>
+            </div>
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img id="newsImg1" src="" class="d-block w-100" alt="news1" />
+                <div class="carousel-caption d-none d-md-block"></div>
+                <div>
+                  <h6 id="newsTitle1"></h6>
+                  <a id="newsHref1" href="" target="_blank">Read Article</a>
+                </div>
+              </div>
+              <div class="carousel-item">
+                <img id="newsImg2" src="" class="d-block w-100" alt="news2" />
+                <div class="carousel-caption d-none d-md-block"></div>
+                <div>
+                  <h6 id="newsTitle2"></h6>
+                  <a id="newsHref2" href="" target="_blank">Read Article</a>
+                </div>
+              </div>
+              <div class="carousel-item">
+                <img id="newsImg3" src="" class="d-block w-100" alt="news3" />
+                <div class="carousel-caption d-none d-md-block"></div>
+                <div>
+                  <h6 id="newsTitle3"></h6>
+                  <a id="newsHref3" href="" target="_blank">Read Article</a>
+                </div>
+              </div>
+            </div>
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#carousel"
+              data-bs-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#carousel"
+              data-bs-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal holiday -->
+    <div
+      class="modal fade text-center"
+      id="holidayModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="holidayModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="holidayModalLabel"></h5>
+            <img class="flag" src="" alt="flag" />
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless table-striped">
+              <tr>
+                <td id="name" class="text-start fw-bold"></td>
+                <td id="date" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name1" class="text-start fw-bold"></td>
+                <td id="date1" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name2" class="text-start fw-bold"></td>
+                <td id="date2" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name3" class="text-start fw-bold"></td>
+                <td id="date3" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name4" class="text-start fw-bold"></td>
+                <td id="date4" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name5" class="text-start fw-bold"></td>
+                <td id="date5" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name6" class="text-start fw-bold"></td>
+                <td id="date6" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name7" class="text-start fw-bold"></td>
+                <td id="date7" class="text-end"></td>
+              </tr>
+              <tr>
+                <td id="name8" class="text-start fw-bold"></td>
+                <td id="date8" class="text-end"></td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal wiki -->
+    <div
+      class="modal fade text-center"
+      id="wikiModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="wikiModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="wikiModalLabel"></h5>
+            <img class="flag" src="" alt="flag" />
+          </div>
+          <div class="modal-body">
+            <table class="table table-borderless table-striped">
+              <tr>
+                <td>
+                  <img id="img1" src="" />
+                  <div id="wiki1"></div>
+                  <a href="" id="article1" target="_blank">Continue reading</a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <img id="img2" src="" />
+                  <div id="wiki2"></div>
+                  <a href="" id="article2" target="_blank">Continue reading</a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <img id="img3" src="" />
+                  <div id="wiki3"></div>
+                  <a href="" id="article3" target="_blank">Continue reading</a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <img id="img4" src="" />
+                  <div id="wiki4"></div>
+                  <a href="" id="article4" target="_blank">Continue reading</a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <img id="img5" src="" />
+                  <div id="wiki5"></div>
+                  <a href="" id="article5" target="_blank">Continue reading</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="dist/jquery-3.6.2.min.js"></script>
+    <script src="dist/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/leaflet.js"></script>
+    <script src="dist/easy-button.js"></script>
+    <script src="dist/leaflet.markercluster-src.js"></script>
+    <script src="js/leaflet.extra-markers.min.js"></script>
+    <script src="src/date.js"></script>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
